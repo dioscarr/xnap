@@ -28,7 +28,10 @@ app.get('/', (req, res) => {
                             xurl:`${data.url}`,
                             citystate: data.citystate,
                             categories:data.categories,
-                            review_count:data.review_count
+                            review_count:data.review_count,
+                            review_count:data.review_count,
+                            zip:data.zip,
+                            rating:data.rating
                           };
             client.db("xbusiness")
                     .collection("lead")
@@ -116,6 +119,7 @@ app.get('/leads', (req, res) => {
     
   
 app.listen(3000, () => {
-    console.log('http://localhost:3000/users');
+    console.log('http://localhost:3000/');
+    console.log('http://localhost:3000/leads');
   });
   
