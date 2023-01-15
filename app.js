@@ -1,10 +1,10 @@
-const cors = require('cors');
-const express = require('express');
+const cors = require("cors");
+const express = require("express");
 const app = express();
 const axios = require("axios");
-const client = require('./db');
-const { ObjectId } = require('mongodb');
-const bodyParser = require('body-parser');
+const client = require("./db");
+const { ObjectId } = require("mongodb");
+const bodyParser = require("body-parser");
 
 app.use(cors());
 
@@ -12,179 +12,230 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
-app.get('/ReloadCats', async (req, res) => {
-  console.log("GetRecipeSuggestions");
+app.get("/ReloadCats", async (req, res) => {
   try {
-    const response = await axios.get("https://recipexerver.onrender.com/yelp/categoriesandaliases")
+    await client.connect();
+    const response = await axios.get(
+      "https://recipexerver.onrender.com/yelp/categoriesandaliases"
+    );
     console.log(response.data);
     const data = response.data;
     const db = client.db("xbusiness");
     const collections = await db.listCollections().toArray();
-    const yelpcatsExist = collections.some(collection => collection.name === 'cats');
+    const yelpcatsExist = collections.some(
+      (collection) => collection.name === "cats"
+    );
     if (yelpcatsExist) {
-        console.log("Collection 'yelpcats' exists");
-        await db.collection("cats").drop();
+      console.log("Collection 'yelpcats' exists");
+      await db.collection("cats").drop();
     } else {
-        console.log("Collection 'yelpcats' does not exist");
+      console.log("Collection 'yelpcats' does not exist");
     }
     await db.createCollection("cats");
     await db.collection("cats").insertMany(data);
     client.close();
     res.status(201).json({
-        message: `Successfully inserted yelpcats`
+      message: `Successfully inserted yelpcats`,
     });
   } catch (err) {
-      res.status(500).json({
-        message: err
-      });
+    res.status(500).json({
+      message: err.message,
+    });
   } finally {
-    // close the connection
-
+    client.close();
+  }
+});
+app.get("/yelpcats", async (req, res) => {
+  try {
+    await client.connect();
+    await client
+      .db("xbusiness")
+      .collection("cats")
+      .find()
+      .toArray()
+      .then((leads) => {
+        res.status(200).json(leads);
+      })
+      .catch((err) => {
+        res.status(500).json({
+          message: err.message,
+        });
+      });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    client.close();
   }
 });
 
-
-app.get('/yelpcats', async(req, res) => {
+app.get("/", async (req, res) => {
   try {
-  await client.db("xbusiness").collection("cats").find().toArray()
-   .then(leads => {
-     res.status(200).json(leads);
-     client.close();
-   })
-   .catch(err => {
-     res.status(500).json({
-       message: err
+    await client.connect();
+    await axios
+      .get(
+        "https://recipexerver.onrender.com/BusinessSearchByLocationCategories?limit=1&state=NY"
+      )
+      .then(async (response) => {
+        console.log(response.data);
+        //{name:'',phone:'',url:'',citystate:'',categories:'',review_count:0};
+        const data = response.data[0];
+        const lead = {
+          xname: data.name,
+          xphone: data.phone,
+          xurl: `${data.url}`,
+          citystate: data.citystate,
+          categories: data.categories,
+          review_count: data.review_count,
+          review_count: data.review_count,
+          zip: data.zip,
+          rating: data.rating,
+        };
+        client
+          .db("xbusiness")
+          .collection("lead")
+          .insertOne(lead)
+          .then((result) => {
+            client.close();
+            res.status(201).json({
+              message: `Successfully inserted lead: ${result.insertedId}`,
+            });
+          })
+          .catch((err) => {
+            res.status(500).json({
+              message: err,
+            });
+          });
       });
-      client.close();
-   });
-
-    
-  } catch (err) {
-    res.status(500).json({
-      message: err
-    });
-} finally {
-
-}
+  } catch (error) {
+    console.error(error);
+  } finally {
+    client.close();
+  }
 });
-
-app.get('/', async(req, res) => {
-    console.log("GetRecipeSuggestions");
-    try {
-     await axios
-        .get(
-            "https://recipexerver.onrender.com/BusinessSearchByLocationCategories?limit=1&state=NY"
-        ).then(async (response) => {
-            console.log(response.data);
-            //{name:'',phone:'',url:'',citystate:'',categories:'',review_count:0};
-            const data = response.data[0];
-            const lead =  {
-                            xname:data.name,
-                            xphone:data.phone,
-                            xurl:`${data.url}`,
-                            citystate: data.citystate,
-                            categories:data.categories,
-                            review_count:data.review_count,
-                            review_count:data.review_count,
-                            zip:data.zip,
-                            rating:data.rating
-                          };
-            client.db("xbusiness")
-                    .collection("lead")
-                    .insertOne(lead).then(result => {
-                        client.close();
-                        res.status(201).json({
-                        message: `Successfully inserted lead: ${result.insertedId}`
-                    });
-        })
-      .catch(err => {
+app.post("/leads", async (req, res) => {
+  try {
+    await client.connect();
+    const lead = req.body;
+    await client
+      .db("xbusiness")
+      .collection("lead")
+      .insertOne(lead)
+      .then((result) => {
+        client.close();
+        res.status(201).json({
+          message: `Successfully inserted lead: ${result.insertedId}`,
+        });
+      })
+      .catch((err) => {
         res.status(500).json({
-          message: err
+          message: err,
         });
       });
-    });  
-    } catch (error) {
-        console.error(error);
-    }
-});
-app.post('/leads', async(req, res) => {
-  const lead = req.body;
-  await client.db("xbusiness").collection("lead").insertOne(lead)
-    .then(result => {
-      client.close();
-      res.status(201).json({
-        message: `Successfully inserted lead: ${result.insertedId}`
-      });
-    })
-    .catch(err => {
-      res.status(500).json({
-        message: err
-      });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
     });
+  } finally {
+    client.close();
+  }
 });
-app.get('/leads', async(req, res) => {
-    await client.db("xbusiness").collection("lead").find().toArray()
-      .then(leads => {
+app.get("/leads", async (req, res) => {
+  try {
+    await client.connect();
+    await client
+      .db("xbusiness")
+      .collection("lead")
+      .find()
+      .toArray()
+      .then((leads) => {
         client.close();
         res.status(200).json(leads);
       })
-      .catch(err => {
+      .catch((err) => {
         res.status(500).json({
-          message: err
+          message: err,
         });
       });
-  });
-  app.put('/leads/:id', async(req, res) => {
+  } catch (err) {
+    res.status(500).json({
+      message: err,
+    });
+  } finally {
+    client.close();
+  }
+});
+app.put("/leads/:id", async (req, res) => {
+  await client.connect();
+  try {
     const id = req.params.id;
     const newData = req.body;
-    await client.db("xbusiness").collection("lead").updateOne({ _id: ObjectId(id) }, { $set: newData })
-      .then(result => {
+    await client
+      .db("xbusiness")
+      .collection("lead")
+      .updateOne({ _id: ObjectId(id) }, { $set: newData })
+      .then((result) => {
         client.close();
         if (result.matchedCount > 0) {
-          
           res.status(200).json({
-            message: `Successfully updated lead with id: ${id}`
+            message: `Successfully updated lead with id: ${id}`,
           });
         } else {
-
           res.status(404).json({
-            message: `No lead found with id: ${id}`
+            message: `No lead found with id: ${id}`,
           });
         }
       })
-      .catch(err => {
+      .catch((err) => {
         res.status(500).json({
-          message: err
+          message: err,
         });
       });
-  });
-  app.delete('/leads/:id', async(req, res) => {
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    client.close();
+  }
+});
+app.delete("/leads/:id", async (req, res) => {
+  try {
     const id = req.params.id;
-    await client.db("xbusiness").collection("lead").deleteOne({ _id: ObjectId(id) })
-      .then(result => {
+    await client.connect();
+    await client
+      .db("xbusiness")
+      .collection("lead")
+      .deleteOne({ _id: ObjectId(id) })
+      .then((result) => {
         client.close();
         if (result.deletedCount > 0) {
           res.status(200).json({
-            message: `Successfully deleted lead with id: ${id}`
+            message: `Successfully deleted lead with id: ${id}`,
           });
         } else {
           res.status(404).json({
-            message: `No lead found with id: ${id}`
+            message: `No lead found with id: ${id}`,
           });
         }
       })
-      .catch(err => {
+      .catch((err) => {
         res.status(500).json({
-          message: err
+          message: err,
         });
       });
-  });
-    
-  
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    client.close();
+  }
+});
 app.listen(3000, () => {
-    console.log('http://localhost:3000/');
-    console.log('http://localhost:3000/yelpcats');
-    console.log('http://localhost:3000/leads');
-    console.log('http://localhost:3000/ReloadCats');
-  });
-  
+  console.log("http://localhost:3000/");
+  console.log("http://localhost:3000/yelpcats");
+  console.log("http://localhost:3000/leads");
+  console.log("http://localhost:3000/ReloadCats");
+});
