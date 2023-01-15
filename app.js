@@ -44,9 +44,9 @@ app.get('/ReloadCats', async (req, res) => {
 });
 
 
-app.get('/yelpcats', (req, res) => {
+app.get('/yelpcats', async(req, res) => {
   try {
-  client.db("xbusiness").collection("cats").find().toArray()
+  await client.db("xbusiness").collection("cats").find().toArray()
    .then(leads => {
      res.status(200).json(leads);
      client.close();
@@ -68,10 +68,10 @@ app.get('/yelpcats', (req, res) => {
 }
 });
 
-app.get('/', (req, res) => {
+app.get('/', async(req, res) => {
     console.log("GetRecipeSuggestions");
     try {
-        axios
+     await axios
         .get(
             "https://recipexerver.onrender.com/BusinessSearchByLocationCategories?limit=1&state=NY"
         ).then(async (response) => {
@@ -92,6 +92,7 @@ app.get('/', (req, res) => {
             client.db("xbusiness")
                     .collection("lead")
                     .insertOne(lead).then(result => {
+                        client.close();
                         res.status(201).json({
                         message: `Successfully inserted lead: ${result.insertedId}`
                     });
@@ -106,10 +107,11 @@ app.get('/', (req, res) => {
         console.error(error);
     }
 });
-app.post('/leads', (req, res) => {
+app.post('/leads', async(req, res) => {
   const lead = req.body;
-  client.db("xbusiness").collection("lead").insertOne(lead)
+  await client.db("xbusiness").collection("lead").insertOne(lead)
     .then(result => {
+      client.close();
       res.status(201).json({
         message: `Successfully inserted lead: ${result.insertedId}`
       });
@@ -120,9 +122,10 @@ app.post('/leads', (req, res) => {
       });
     });
 });
-app.get('/leads', (req, res) => {
-    client.db("xbusiness").collection("lead").find().toArray()
+app.get('/leads', async(req, res) => {
+    await client.db("xbusiness").collection("lead").find().toArray()
       .then(leads => {
+        client.close();
         res.status(200).json(leads);
       })
       .catch(err => {
@@ -131,16 +134,19 @@ app.get('/leads', (req, res) => {
         });
       });
   });
-  app.put('/leads/:id', (req, res) => {
+  app.put('/leads/:id', async(req, res) => {
     const id = req.params.id;
     const newData = req.body;
-    client.db("xbusiness").collection("lead").updateOne({ _id: ObjectId(id) }, { $set: newData })
+    await client.db("xbusiness").collection("lead").updateOne({ _id: ObjectId(id) }, { $set: newData })
       .then(result => {
+        client.close();
         if (result.matchedCount > 0) {
+          
           res.status(200).json({
             message: `Successfully updated lead with id: ${id}`
           });
         } else {
+
           res.status(404).json({
             message: `No lead found with id: ${id}`
           });
@@ -152,10 +158,11 @@ app.get('/leads', (req, res) => {
         });
       });
   });
-  app.delete('/leads/:id', (req, res) => {
+  app.delete('/leads/:id', async(req, res) => {
     const id = req.params.id;
-    client.db("xbusiness").collection("lead").deleteOne({ _id: ObjectId(id) })
+    await client.db("xbusiness").collection("lead").deleteOne({ _id: ObjectId(id) })
       .then(result => {
+        client.close();
         if (result.deletedCount > 0) {
           res.status(200).json({
             message: `Successfully deleted lead with id: ${id}`
