@@ -20,7 +20,16 @@ app.get('/', (req, res) => {
         )
         .then(async (response) => {
             console.log(response.data);
-            const lead = {xname:'new business',xphone:'3475445544',xurl:`${response.data[0]}`};
+            //{name:'',phone:'',url:'',citystate:'',categories:'',review_count:0};
+            const data = response.data[0];
+            const lead =  {
+                            xname:data.name,
+                            xphone:data.phone,
+                            xurl:`${data.url}`,
+                            citystate: data.citystate,
+                            categories:data.categories,
+                            review_count:data.review_count
+                          };
             client.db("xbusiness")
                     .collection("lead")
                     .insertOne(lead).then(result => {
