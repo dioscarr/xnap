@@ -1,14 +1,25 @@
 {
   "name": "xnap",
-  "version": "0.0.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node app.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dioscarr/xnap.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dioscarr/xnap/issues"
+  },
+  "homepage": "https://github.com/dioscarr/xnap#readme",
   "dependencies": {
-    "cookie-parser": "~1.4.4",
-    "debug": "~2.6.9",
-    "express": "~4.16.1",
-    "morgan": "~1.9.1"
+    "axios": "^1.2.2",
+    "express": "^4.18.2",
+    "mongodb": "^4.13.0"
   }
 }
