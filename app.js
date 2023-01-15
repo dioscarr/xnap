@@ -4,6 +4,7 @@ const client = require('./db');
 const axios = require("axios");
 const app = express();
 const bodyParser = require('body-parser');
+const cors = require('cors');
 app.use(cors());
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
