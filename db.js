@@ -1,5 +1,5 @@
 const MongoClient = require('mongodb').MongoClient;
-const uri = `${process.env.process.env.MONGODB_CONNECTION}`;
+const uri = `${process.env.MONGODB_CONNECTION}`;
 const client = new MongoClient(uri, { useNewUrlParser: true });
 client.connect()
   .then(() => {
