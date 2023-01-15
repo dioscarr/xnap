@@ -1,16 +1,16 @@
-const express = require('express');
-const { ObjectId } = require('mongodb');
-const client = require('./db');
-const axios = require("axios");
-const app = express();
-const bodyParser = require('body-parser');
 const cors = require('cors');
+const express = require('express');
+const app = express();
+const axios = require("axios");
+const client = require('./db');
+const { ObjectId } = require('mongodb');
+const bodyParser = require('body-parser');
+
 app.use(cors());
-// parse application/x-www-form-urlencoded
+
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
-
 
 app.get('/ReloadCats', async (req, res) => {
   console.log("GetRecipeSuggestions");
@@ -29,6 +29,7 @@ app.get('/ReloadCats', async (req, res) => {
     }
     await db.createCollection("cats");
     await db.collection("cats").insertMany(data);
+    client.close();
     res.status(201).json({
         message: `Successfully inserted yelpcats`
     });
@@ -38,7 +39,7 @@ app.get('/ReloadCats', async (req, res) => {
       });
   } finally {
     // close the connection
-    client.close();
+
   }
 });
 
