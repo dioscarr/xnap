@@ -11,14 +11,69 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
+
+app.get('/ReloadCats', async (req, res) => {
+  console.log("GetRecipeSuggestions");
+  try {
+    const response = await axios.get("https://recipexerver.onrender.com/yelp/categoriesandaliases")
+    console.log(response.data);
+    const data = response.data;
+    const db = client.db("xbusiness");
+    const collections = await db.listCollections().toArray();
+    const yelpcatsExist = collections.some(collection => collection.name === 'cats');
+    if (yelpcatsExist) {
+        console.log("Collection 'yelpcats' exists");
+        await db.collection("cats").drop();
+    } else {
+        console.log("Collection 'yelpcats' does not exist");
+    }
+    await db.createCollection("cats");
+    await db.collection("cats").insertMany(data);
+    res.status(201).json({
+        message: `Successfully inserted yelpcats`
+    });
+  } catch (err) {
+      res.status(500).json({
+        message: err
+      });
+  } finally {
+    // close the connection
+    client.close();
+  }
+});
+
+
+app.get('/yelpcats', (req, res) => {
+  try {
+  client.db("xbusiness").collection("cats").find().toArray()
+   .then(leads => {
+     res.status(200).json(leads);
+     client.close();
+   })
+   .catch(err => {
+     res.status(500).json({
+       message: err
+      });
+      client.close();
+   });
+
+    
+  } catch (err) {
+    res.status(500).json({
+      message: err
+    });
+} finally {
+
+}
+});
+
 app.get('/', (req, res) => {
     console.log("GetRecipeSuggestions");
     try {
         axios
         .get(
             "https://recipexerver.onrender.com/BusinessSearchByLocationCategories?limit=1&state=NY"
-        )
-        .then(async (response) => {
+        ).then(async (response) => {
             console.log(response.data);
             //{name:'',phone:'',url:'',citystate:'',categories:'',review_count:0};
             const data = response.data[0];
@@ -120,6 +175,8 @@ app.get('/leads', (req, res) => {
   
 app.listen(3000, () => {
     console.log('http://localhost:3000/');
+    console.log('http://localhost:3000/yelpcats');
     console.log('http://localhost:3000/leads');
+    console.log('http://localhost:3000/ReloadCats');
   });
   
