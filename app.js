@@ -3,6 +3,13 @@ const { ObjectId } = require('mongodb');
 const client = require('./db');
 const axios = require("axios");
 const app = express();
+const bodyParser = require('body-parser');
+app.use(cors());
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(bodyParser.json());
+
 app.get('/', (req, res) => {
     console.log("GetRecipeSuggestions");
     try {
