@@ -73,12 +73,15 @@ app.get("/yelpcats", async (req, res) => {
 app.get("/", async (req, res) => {
   try {
     await client.connect();
-    const location = req.params.location;
-    const Category = req.params.Category;
+    const location = req.query.location;
+    const Category = req.query.category;
+
+
 
     await axios
       .get(
-        `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category${Category}limit=1`
+         `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+       // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
       )
       .then(async (response) => {
         console.log(response.data);
@@ -95,12 +98,11 @@ app.get("/", async (req, res) => {
           zip: data.zip,
           rating: data.rating,
         };
-        client
+       await client
           .db("xbusiness")
           .collection("lead")
           .insertOne(lead)
-          .then((result) => {
-            client.close();
+          .then((result) => {          
             res.status(201).json({
               message: `Successfully inserted lead: ${result.insertedId}`,
             });
@@ -236,7 +238,7 @@ app.delete("/leads/:id", async (req, res) => {
     client.close();
   }
 });
-app.listen(3000, () => {
+app.listen(3001, () => {
   console.log("http://localhost:3000/");
   console.log("http://localhost:3000/yelpcats");
   console.log("http://localhost:3000/leads");
