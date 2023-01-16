@@ -33,7 +33,7 @@ app.get("/ReloadCats", async (req, res) => {
     }
     await db.createCollection("cats");
     await db.collection("cats").insertMany(data);
-    client.close();
+    //client.close();
     res.status(201).json({
       message: `Successfully inserted yelpcats`,
     });
@@ -42,7 +42,7 @@ app.get("/ReloadCats", async (req, res) => {
       message: err.message,
     });
   } finally {
-    client.close();
+    //client.close();
   }
 });
 app.get("/yelpcats", async (req, res) => {
@@ -66,7 +66,7 @@ app.get("/yelpcats", async (req, res) => {
       message: err.message,
     });
   } finally {
-    client.close();
+    //client.close();
   }
 });
 
@@ -115,7 +115,7 @@ app.get("/", async (req, res) => {
     console.error(error);
   } finally {
     if (client != undefined && client !== "undefined") {
-      client.close();
+      ////client.close();
     }
   }
 });
@@ -128,7 +128,7 @@ app.post("/leads", async (req, res) => {
       .collection("lead")
       .insertOne(lead)
       .then((result) => {
-        client.close();
+        //client.close();
         res.status(201).json({
           message: `Successfully inserted lead: ${result.insertedId}`,
         });
@@ -144,7 +144,7 @@ app.post("/leads", async (req, res) => {
     });
   } finally {
     if (client != undefined && client !== "undefined") {
-      client.close();
+      //client.close();
     }
   }
 });
@@ -158,7 +158,7 @@ app.get("/leads", async (req, res) => {
       .toArray()
       .then((leads) => {
         if (client != undefined && client !== "undefined") {
-          client.close();
+          //client.close();
         }
         res.status(200).json(leads);
       })
@@ -173,7 +173,7 @@ app.get("/leads", async (req, res) => {
     });
   } finally {
     if (client != undefined && client !== "undefined") {
-      client.close();
+      //client.close();
     }
   }
 });
@@ -188,7 +188,7 @@ app.put("/leads/:id", async (req, res) => {
       .updateOne({ _id: ObjectId(id) }, { $set: newData })
       .then((result) => {
         if (client != undefined && client !== "undefined") {
-          client.close();
+          //client.close();
         }
         if (result.matchedCount > 0) {
           res.status(200).json({
@@ -212,7 +212,7 @@ app.put("/leads/:id", async (req, res) => {
   } finally {
     if (client != undefined && client !== "undefined") {
       if (client != undefined && client !== "undefined") {
-        client.close();
+        //client.close();
       }
     }
   }
@@ -227,7 +227,7 @@ app.delete("/leads/:id", async (req, res) => {
       .deleteOne({ _id: ObjectId(id) })
       .then((result) => {
         if (client != undefined && client !== "undefined") {
-          client.close();
+          //client.close();
         }
         if (result.deletedCount > 0) {
           res.status(200).json({
@@ -250,7 +250,7 @@ app.delete("/leads/:id", async (req, res) => {
     });
   } finally {
     if (client != undefined && client !== "undefined") {
-      client.close();
+      //client.close();
     }
   }
 });
