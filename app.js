@@ -73,9 +73,12 @@ app.get("/yelpcats", async (req, res) => {
 app.get("/", async (req, res) => {
   try {
     await client.connect();
+    const location = req.params.location;
+    const Category = req.params.Category;
+
     await axios
       .get(
-        "https://recipexerver.onrender.com/BusinessSearchByLocationCategories?limit=1&state=NY"
+        `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category${Category}limit=1`
       )
       .then(async (response) => {
         console.log(response.data);
