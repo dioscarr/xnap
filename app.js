@@ -85,9 +85,8 @@ app.get("/BusinessSearch", async (req, res) => {
         // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
       )
       .then(async (response) => {
-        console.log(response.data);
-        //{name:'',phone:'',url:'',citystate:'',categories:'',review_count:0};
-        const data = response.data[0];
+        const randomIndex = Math.floor(Math.random() * response.data.length);
+        const data = response.data[randomIndex];
         const lead = {
           xname: data.name,
           xphone: data.phone,
