@@ -13,8 +13,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.get("/ReloadCats", async (req, res) => {
+  await client.connect();
   try {
-    await client.connect();
     const response = await axios.get(
       "https://recipexerver.onrender.com/yelp/categoriesandaliases"
     );
@@ -46,8 +46,8 @@ app.get("/ReloadCats", async (req, res) => {
   }
 });
 app.get("/yelpcats", async (req, res) => {
+  await client.connect();
   try {
-    await client.connect();
     await client
       .db("xbusiness")
       .collection("cats")
@@ -71,8 +71,8 @@ app.get("/yelpcats", async (req, res) => {
 });
 
 app.get("/", async (req, res) => {
+  await client.connect();
   try {
-    await client.connect();
     const location = req.query.location;
     const Category = req.query.category;
 
@@ -120,8 +120,8 @@ app.get("/", async (req, res) => {
   }
 });
 app.post("/leads", async (req, res) => {
+  await client.connect();
   try {
-    await client.connect();
     const lead = req.body;
     await client
       .db("xbusiness")
@@ -149,8 +149,8 @@ app.post("/leads", async (req, res) => {
   }
 });
 app.get("/leads", async (req, res) => {
+  await client.connect();
   try {
-    await client.connect();
     await client
       .db("xbusiness")
       .collection("lead")
@@ -218,9 +218,9 @@ app.put("/leads/:id", async (req, res) => {
   }
 });
 app.delete("/leads/:id", async (req, res) => {
+  await client.connect();
   try {
     const id = req.params.id;
-    await client.connect();
     await client
       .db("xbusiness")
       .collection("lead")
