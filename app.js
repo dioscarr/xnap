@@ -85,23 +85,25 @@ app.get("/BusinessSearch", async (req, res) => {
         // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
       )
       .then(async (response) => {
-        const randomIndex = Math.floor(Math.random() * response.data.length);
-        const data = response.data[randomIndex];
-        const lead = {
-          xname: data.name,
-          xphone: data.phone,
-          xurl: `${data.url}`,
-          citystate: data.citystate,
-          categories: data.categories,
-          review_count: data.review_count,
-          review_count: data.review_count,
-          zip: data.zip,
-          rating: data.rating,
-        };
+       // const randomIndex = Math.floor(Math.random() * response.data.length);
+       // const data = response.data[randomIndex];
+        // const lead = {
+        //   xname: data.name,
+        //   xphone: data.phone,
+        //   xurl: `${data.url}`,
+        //   citystate: data.citystate,
+        //   categories: data.categories,
+        //   review_count: data.review_count,
+        //   review_count: data.review_count,
+        //   zip: data.zip,
+        //   rating: data.rating,
+        // };
+        console.log(JSON.stringify(response.data));
         await client
           .db("xbusiness")
           .collection("lead")
-          .insertOne(lead)
+          //.insertOne(lead)
+          .insertMany(response.data)
           .then((result) => {
             res.status(201).json({
               message: `Successfully inserted lead: ${result.insertedId}`,
