@@ -76,12 +76,10 @@ app.get("/", async (req, res) => {
     const location = req.query.location;
     const Category = req.query.category;
 
-
-
     await axios
       .get(
-         `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
-       // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+        `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+        // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
       )
       .then(async (response) => {
         console.log(response.data);
@@ -98,11 +96,11 @@ app.get("/", async (req, res) => {
           zip: data.zip,
           rating: data.rating,
         };
-       await client
+        await client
           .db("xbusiness")
           .collection("lead")
           .insertOne(lead)
-          .then((result) => {          
+          .then((result) => {
             res.status(201).json({
               message: `Successfully inserted lead: ${result.insertedId}`,
             });
@@ -116,7 +114,9 @@ app.get("/", async (req, res) => {
   } catch (error) {
     console.error(error);
   } finally {
-    client.close();
+    if (client != undefined && client !== "undefined") {
+      client.close();
+    }
   }
 });
 app.post("/leads", async (req, res) => {
@@ -143,7 +143,9 @@ app.post("/leads", async (req, res) => {
       message: err.message,
     });
   } finally {
-    client.close();
+    if (client != undefined && client !== "undefined") {
+      client.close();
+    }
   }
 });
 app.get("/leads", async (req, res) => {
@@ -155,7 +157,9 @@ app.get("/leads", async (req, res) => {
       .find()
       .toArray()
       .then((leads) => {
-        client.close();
+        if (client != undefined && client !== "undefined") {
+          client.close();
+        }
         res.status(200).json(leads);
       })
       .catch((err) => {
@@ -168,7 +172,9 @@ app.get("/leads", async (req, res) => {
       message: err,
     });
   } finally {
-    client.close();
+    if (client != undefined && client !== "undefined") {
+      client.close();
+    }
   }
 });
 app.put("/leads/:id", async (req, res) => {
@@ -181,7 +187,9 @@ app.put("/leads/:id", async (req, res) => {
       .collection("lead")
       .updateOne({ _id: ObjectId(id) }, { $set: newData })
       .then((result) => {
-        client.close();
+        if (client != undefined && client !== "undefined") {
+          client.close();
+        }
         if (result.matchedCount > 0) {
           res.status(200).json({
             message: `Successfully updated lead with id: ${id}`,
@@ -202,7 +210,11 @@ app.put("/leads/:id", async (req, res) => {
       message: err.message,
     });
   } finally {
-    client.close();
+    if (client != undefined && client !== "undefined") {
+      if (client != undefined && client !== "undefined") {
+        client.close();
+      }
+    }
   }
 });
 app.delete("/leads/:id", async (req, res) => {
@@ -214,7 +226,9 @@ app.delete("/leads/:id", async (req, res) => {
       .collection("lead")
       .deleteOne({ _id: ObjectId(id) })
       .then((result) => {
-        client.close();
+        if (client != undefined && client !== "undefined") {
+          client.close();
+        }
         if (result.deletedCount > 0) {
           res.status(200).json({
             message: `Successfully deleted lead with id: ${id}`,
@@ -235,7 +249,9 @@ app.delete("/leads/:id", async (req, res) => {
       message: err.message,
     });
   } finally {
-    client.close();
+    if (client != undefined && client !== "undefined") {
+      client.close();
+    }
   }
 });
 app.listen(3001, () => {
