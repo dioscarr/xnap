@@ -73,8 +73,8 @@ app.get("/yelpcats", async (req, res) => {
 app.get("/", async (req, res) => {
   await client.connect();
   try {
-    const location = req.query.location;
-    const Category = req.query.category;
+    const location = req.query?.location??"";
+    const Category = req.query?.category??"";
     console.log(`https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`);
 
 
