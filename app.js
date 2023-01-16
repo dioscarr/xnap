@@ -75,42 +75,47 @@ app.get("/", async (req, res) => {
   try {
     const location = req.query.location;
     const Category = req.query.category;
+    console.log(`https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`);
 
-    await axios
-      .get(
-        `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
-        // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
-      )
-      .then(async (response) => {
-        console.log(response.data);
-        //{name:'',phone:'',url:'',citystate:'',categories:'',review_count:0};
-        const data = response.data[0];
-        const lead = {
-          xname: data.name,
-          xphone: data.phone,
-          xurl: `${data.url}`,
-          citystate: data.citystate,
-          categories: data.categories,
-          review_count: data.review_count,
-          review_count: data.review_count,
-          zip: data.zip,
-          rating: data.rating,
-        };
-        await client
-          .db("xbusiness")
-          .collection("lead")
-          .insertOne(lead)
-          .then((result) => {
-            res.status(201).json({
-              message: `Successfully inserted lead: ${result.insertedId}`,
-            });
-          })
-          .catch((err) => {
-            res.status(500).json({
-              message: err,
-            });
-          });
-      });
+
+    // await axios
+    //   .get(
+    //     `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+    //     // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+    //   )
+    //   .then(async (response) => {
+    //     console.log(response.data);
+    //     //{name:'',phone:'',url:'',citystate:'',categories:'',review_count:0};
+    //     const data = response.data[0];
+    //     const lead = {
+    //       xname: data.name,
+    //       xphone: data.phone,
+    //       xurl: `${data.url}`,
+    //       citystate: data.citystate,
+    //       categories: data.categories,
+    //       review_count: data.review_count,
+    //       review_count: data.review_count,
+    //       zip: data.zip,
+    //       rating: data.rating,
+    //     };
+    //     await client
+    //       .db("xbusiness")
+    //       .collection("lead")
+    //       .insertOne(lead)
+    //       .then((result) => {
+    //         res.status(201).json({
+    //           message: `Successfully inserted lead: ${result.insertedId}`,
+    //         });
+    //       })
+    //       .catch((err) => {
+    //         res.status(500).json({
+    //           message: err,
+    //         });
+    //       });
+    //   });
+
+
+    res.send("OK!")
   } catch (error) {
     console.error(error);
   } finally {
