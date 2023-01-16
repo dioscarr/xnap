@@ -114,9 +114,6 @@ app.get("/BusinessSearch", async (req, res) => {
             });
           });
       });
-
-
-    res.send("OK!")
   } catch (error) {
     console.error(error);
   } finally {
