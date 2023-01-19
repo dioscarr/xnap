@@ -12,6 +12,70 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
+
+app.get("/findemails", async (req, res) => {
+  await client.connect();
+  
+  try { 
+    const skip = parseInt(req.query?.skip??"0");
+    const next = parseInt(req.query?.next??"1");
+    
+    await client
+    .db("xbusiness")
+    .collection("lead")
+    // .find({xurl:'http://www.jimillingworthmillwork.com'})
+    .find({xurl:{$ne:"N/A"}})
+    .skip(skip)
+    .limit(next)
+    .toArray()
+    .then((leads) => 
+    {
+      Promise.all(
+        leads.filter(x=>x.xurl!=="N/A").map(async lead=>
+        {
+        const params = {url:lead.xurl}
+        console.log("{url:x.xurl}" + lead.xurl)
+         const response = axios.get("https://pyyelp.onrender.com/findemail", { params })
+         //const response = axios.get("http://127.0.0.1:5000/findemail", { params })
+        return response;
+        })
+      ).then(async response=>
+        {
+          console.log(response)
+          if(response.length>0)
+          {
+            await client
+            .db("xbusiness")
+            .collection("emails")
+            .insertMany(response.filter(x=>x.data.emails.length>0).map(x=>{return{url:x.data.url,emails:x.data.emails}}))
+            .then((result) => {
+                res.status(200).json(response.filter(x=>x.data.emails.length>0).map(x=>{return{url:x.data.url,emails:x.data.emails}}))              
+            })
+            .catch((err) => {
+              res.status(500).json({
+                message: err,
+              });
+            });
+
+          }
+        }
+        ).catch(error=>res.status(500).json(error))
+    })
+
+    
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+}
+)
+
+
 app.get("/ReloadCats", async (req, res) => {
   await client.connect();
   try {
@@ -81,8 +145,8 @@ app.get("/BusinessSearch", async (req, res) => {
     
     await axios
       .get(
-        `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
-        // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+       `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+       // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
       )
       .then(async (response) => {
        // const randomIndex = Math.floor(Math.random() * response.data.length);
@@ -116,6 +180,7 @@ app.get("/BusinessSearch", async (req, res) => {
           });
       });
   } catch (error) {
+    
     console.error(error);
   } finally {
     if (client != undefined && client !== "undefined") {
@@ -259,8 +324,9 @@ app.delete("/leads/:id", async (req, res) => {
   }
 });
 app.listen(3001, () => {
-  console.log("http://localhost:3000/");
-  console.log("http://localhost:3000/yelpcats");
-  console.log("http://localhost:3000/leads");
-  console.log("http://localhost:3000/ReloadCats");
+  console.log("http://localhost:3001/");
+  console.log("http://localhost:3001/yelpcats");
+  console.log("http://localhost:3001/leads");
+  console.log("http://localhost:3001/ReloadCats");
+  console.log("http://localhost:3001/findemails?next=2&skip=0");
 });
