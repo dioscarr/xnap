@@ -75,7 +75,6 @@ app.get("/findemails", async (req, res) => {
 }
 )
 
-
 app.get("/ReloadCats", async (req, res) => {
   await client.connect();
   try {
@@ -134,6 +133,7 @@ app.get("/yelpcats", async (req, res) => {
   }
 });
 app.get("/", async (req, res) =>res.send("Hello World!"));
+
 app.get("/BusinessSearch", async (req, res) => {
   await client.connect();
   try {
@@ -218,24 +218,26 @@ app.post("/leads", async (req, res) => {
   }
 });
 app.get("/leads", async (req, res) => {
+  const skip = parseInt(req.query.skip??"0");
+  const limit = parseInt(req.query.limit??"25");
   await client.connect();
   try {
     await client
-      .db("xbusiness")
-      .collection("lead")
-      .find()
-      .toArray()
-      .then((leads) => {
-        if (client != undefined && client !== "undefined") {
-          //client.close();
-        }
-        res.status(200).json(leads);
-      })
-      .catch((err) => {
-        res.status(500).json({
-          message: err,
-        });
-      });
+    .db("xbusiness")
+    .collection("lead")
+    .aggregate([{
+      $lookup: {
+      from: "emails",
+      localField: "xurl",
+      foreignField: "url",
+      as: "emails"
+      }
+    }])
+    .skip(skip)
+    .limit(limit)
+    .toArray()
+    .then((leads) => res.status(200).json(leads))
+    .catch((err) => res.status(500).json({message: err,}));
   } catch (err) {
     res.status(500).json({
       message: err,
