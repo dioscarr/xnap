@@ -1,7 +1,6 @@
 on:
   schedule:
     - cron:  '0 * * * *'
-    
 jobs:
   monitor-api:
     runs-on: ubuntu-latest
