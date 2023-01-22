@@ -19,4 +19,4 @@ jobs:
       if: failure()
       uses: slack-actions/slack@v1
       with:
-        args: 'send --webhook-url https://hooks.slack.com/services/YOUR/WEBHOOK/URLhttps://hooks.slack.com/services/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 --message "API endpoint failed"' 
+        args: 'send --webhook-url https://hooks.slack.com/services/YOUR/WEBHOOK/URLhttps://hooks.slack.com/services/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 --message "API endpoint failed"'
