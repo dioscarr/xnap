@@ -13,3 +13,6 @@ jobs:
       uses: rtCamp/action-slack-notify@v2.2.0
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_MESSAGE: 'Test Post Content :rocket:'
+        SLACK_TITLE: Lead Alert
+        SLACK_USERNAME: MonitorLeads
