@@ -1,6 +1,8 @@
-on: push
-name: Slack Notification Demo
-jobs:
+on:
+  schedule:
+    - cron:  '*/1 * * * *'    # At every 15th minute
+name: Slack Notification
+jobs: 
   slackNotification:
     name: Slack Notification
     runs-on: ubuntu-latest
