@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
-
+ 
 app.get("/findemails", async (req, res) => {
   await client.connect();
   
@@ -118,7 +118,7 @@ app.get("/    ", async (req, res) => {
       .toArray()
       .then((leads) => {
         res.status(200).json(leads);
-      })
+      })    
       .catch((err) => {
         res.status(500).json({
           message: err.message,
