@@ -17,8 +17,6 @@ jobs:
         fi
     - name: Send notification
       if: failure()
-      uses: https://hooks.slack.com/services/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
+      uses: slack-actions/slack@v1
       with:
-        to: 'dioscarr@gmail.com'
-        subject: 'API endpoint failed'
-        message: 'The response from the API endpoint did not match the expected response.'
+        args: 'send --webhook-url https://hooks.slack.com/services/YOUR/WEBHOOK/URLhttps://hooks.slack.com/services/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 --message "API endpoint failed"''
