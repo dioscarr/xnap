@@ -7,7 +7,7 @@ jobs:
     steps:
     - name: Send request to API endpoint
       run: |
-        curl -s https://xnap1.onrender.com/leads" | grep "expected response"
+        curl -s https://xnap1.onrender.com/lead" | grep "expected response"
     - name: Check response
       run: |
         if [ $? -ne 0 ]; then
