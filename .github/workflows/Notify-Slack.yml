@@ -1,6 +1,6 @@
 on: push
 name: Slack Notification Demo
-jobs:
+jobs: 
   slackNotification:
     name: Slack Notification
     runs-on: ubuntu-latest
