@@ -17,6 +17,6 @@ jobs:
         fi
     - name: Send notification
       if: failure()
-      uses: slack-actions/slack@v1
+      uses: act10ns/slack@v1
       with:
         args: 'send --webhook-url https://hooks.slack.com/services/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 --message "API endpoint failed"'
