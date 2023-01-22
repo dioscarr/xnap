@@ -7,7 +7,7 @@ jobs:
     steps:
     - name: Send request to API endpoint
       run: |
-        curl -s https://xnap1.onrender.com/" | grep "expected response"
+        curl -s https://xnap1.onrender.com/leads" | grep "expected response"
     - name: Check response
       run: |
         if [ $? -ne 0 ]; then
@@ -18,4 +18,4 @@ jobs:
       if: failure()
       uses: slack-actions/slack@v1
       with:
-        args: 'send --webhook-url https://hooks.slack.com/services/YOUR/WEBHOOK/URLhttps://hooks.slack.com/services/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 --message "API endpoint failed"'
+        args: 'send --webhook-url https://hooks.slack.com/services/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 --message "API endpoint failed"'
