@@ -25,7 +25,7 @@ jobs:
       uses: rtCamp/action-slack-notify@v2.2.0
       env:        
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: ${{ steps.deploy-message.outputs.commit_msg }} "We golden another batch completed :rocked"
+        SLACK_MESSAGE: ${{ steps.deploy-message.outputs.commit_msg }} "We golden another batch completed :rocket"
         
         SLACK_TITLE: Email Search Alert
         SLACK_USERNAME: MonitorLeads
