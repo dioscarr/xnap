@@ -12,14 +12,93 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
- 
+app.get("/getskipcount", async (req,res)=>{
+  await client.connect();
+  try{
+    await client
+    .db("xbusiness")
+    .collection("emailsSkipCount")
+    .find()
+    .sort({SkipCount:-1})
+    .limit(1)
+    .toArray()
+    .then(async(emailSkips) =>{
+      console.log(emailSkips);
+      if(emailSkips.length>0)
+      {
+        res.status(200).send(emailSkips[0].SkipCount.toString());
+      }
+      else
+      {
+        res.status(200).send("5");
+      }
+    })
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+})
 app.get("/findemails", async (req, res) => {
   await client.connect();
   
   try { 
-    const skip = parseInt(req.query?.skip??"0");
-    const next = parseInt(req.query?.next??"1");
-    
+    const skip = parseInt(req.query?.skip??"5");
+    const next = parseInt(req.query?.next??"5");
+    const collections = await client.db("xbusiness").listCollections().toArray();
+    const emailsSkipCountExist = collections.some(
+      (collection) => collection.name === "emailsSkipCount"
+    );
+
+    if(emailsSkipCountExist)
+    {
+      await client
+      .db("xbusiness")
+      .collection("emailsSkipCount")
+      .find()
+      .sort({SkipCount:-1})
+      .limit(1)
+      .toArray()
+      .then(async(emailSkips) =>{
+        console.log(emailSkips);
+        if(emailSkips.length>0)
+        {
+          var sk = emailSkips[0].SkipCount + skip;
+              await client
+              .db("xbusiness")
+              .collection("emailsSkipCount")
+              .insertOne({SkipCount:sk})
+              .then((result) => {
+                console.log(`Skip Count Updated: ${result}`)   
+              });
+        }
+        else
+        {
+          await client
+          .db("xbusiness")
+          .collection("emailsSkipCount")
+          .insertOne({SkipCount:skip})
+          .then((result) => {
+            console.log(`Skip Count Updated: ${result}`)   
+          });
+        }
+      }) 
+    }
+    else
+    {
+      await client
+      .db("xbusiness")
+      .collection("emailsSkipCount")
+      .insertOne({SkipCount:skip})
+      .then((result) => {
+        console.log(`Skip Count Updated: ${result}`)   
+      });
+    }  
+
     await client
     .db("xbusiness")
     .collection("lead")
