@@ -6,15 +6,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Get current skip value
+      id: get_current_skip_value
       run: |
         skip=$(curl https://xnap1.onrender.com/getskipcount)
-        echo "skip value: $skip"
-      env:
-        skip: ${{ steps.get_current_skip_value.outputs.skip }}
+        echo "skip value: $skip"   
     - name: Curl request
       run: |
         echo "skip value: $skip"
-        curl "https://xnap1.onrender.com/findemails?next=5&skip=$skip"
+        curl "https://xnap1.onrender.com/findemails?next=5&skip=${{ steps.get_current_skip_value.outputs.skip }}"
     - uses: actions/checkout@v2
     - name: Slack Notify
       uses: rtCamp/action-slack-notify@v2.2.0
