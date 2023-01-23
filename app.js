@@ -25,8 +25,9 @@ app.get("/dequeue", async (req,res)=>{
       console.log(queue[0]);
       if(queue.length>0)
       {
+        console.log(encodeURIComponent(queue[0].xurl));
         await client.db("xbusiness").collection("queue").deleteOne(queue[0]);
-        res.status(200).send(queue[0].xurl);
+        res.status(200).send(encodeURIComponent(queue[0].xurl));
       }
       else
       {
