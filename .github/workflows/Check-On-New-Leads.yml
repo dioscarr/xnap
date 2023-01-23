@@ -7,7 +7,7 @@ jobs:
     steps:
     - name: Get current skip value
       run: |
-        skip=$(curl https://your-api-endpoint.com/getskipcount)
+        skip=$(curl https://xnap1.onrender.com/getskipcount)
     - name: Curl request
       run: |
         curl https://xnap1.onrender.com/findemails?next=5&skip=$skip
