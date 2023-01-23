@@ -217,7 +217,7 @@ app.get("/ReloadCats", async (req, res) => {
     //client.close();
   }
 });
-app.get("/    ", async (req, res) => {
+app.get("/yelpcats", async (req, res) => {
   await client.connect();
   try {
     await client
