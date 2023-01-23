@@ -16,22 +16,23 @@ app.use(bodyParser.json());
 app.post("/addtoqueue", async (req, res) => {
   await client.connect();
   try {
-    const queue = req.body;
-    await client
-      .db("xbusiness")
-      .collection("queue")
-      .insertMany(queue)
-      .then((result) => {
-        //client.close();
-        res.status(201).json({
-          message: `Successfully inserted lead: ${result.insertedId}`,
-        });
-      })
-      .catch((err) => {
-        res.status(500).json({
-          message: err,
-        });
-      });
+    const queue = req.body.data;
+
+
+    const collections = await client.db("xbusiness").listCollections().toArray();
+    const yelpcatsExist = collections.some(
+      (collection) => collection.name === "queue"
+    );
+    if (!yelpcatsExist) {
+      await client.db("xbusiness").createCollection("queue");
+      
+    }
+    await client.db("xbusiness").collection("queue").insertMany(queue.map(x=>{return {xurl:x}}));
+
+    res.status(201).json({
+      message: `Successfully inserted addtoqueue`,
+    });
+
   } catch (err) {
     res.status(500).json({
       message: err.message,
