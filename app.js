@@ -12,7 +12,37 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
-
+app.get("/dequeue", async (req,res)=>{
+  await client.connect();
+  try{
+    await client
+    .db("xbusiness")
+    .collection("queue")
+    .find()
+    .limit(1)
+    .toArray()
+    .then(async(queue) =>{
+      console.log(queue[0]);
+      if(queue.length>0)
+      {
+        await client.db("xbusiness").collection("queue").deleteOne(queue[0]);
+        res.status(200).send(queue[0].xurl);
+      }
+      else
+      {
+        res.status(200).send("done");
+      }
+    })
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+})
 app.post("/addtoqueue", async (req, res) => {
   await client.connect();
   try {
