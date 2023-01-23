@@ -14,7 +14,7 @@ jobs:
       run: |
         skip=$(cat skip.txt)
         echo "skip value: $skip"
-        curl "https://xnap1.onrender.com/findemails?next=5&skip=$skip"
+        curl "https://xnap1.onrender.com/findemails?next=5&skip=($skip + 5)"
     - uses: actions/checkout@v2
     - name: Slack Notify
       uses: rtCamp/action-slack-notify@v2.2.0

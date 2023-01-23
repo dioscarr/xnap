@@ -30,7 +30,7 @@ app.get("/getskipcount", async (req,res)=>{
       }
       else
       {
-        res.status(200).send("5");
+        res.status(200).send("0");
       }
     })
   } catch (err) {
@@ -67,7 +67,7 @@ app.get("/findemails", async (req, res) => {
         console.log(emailSkips);
         if(emailSkips.length>0)
         {
-          var sk = emailSkips[0].SkipCount + skip;
+          var sk = skip;
               await client
               .db("xbusiness")
               .collection("emailsSkipCount")
