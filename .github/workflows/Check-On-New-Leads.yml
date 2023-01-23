@@ -1,4 +1,7 @@
-on: push
+on:
+  schedule:
+    - cron:  '*/10 * * * *'
+     
 name: Check-On-New-Leads
 jobs: 
   slackNotification:
