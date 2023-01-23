@@ -11,7 +11,7 @@ jobs:
         echo "skip value: $skip"
     - name: Curl request
       run: |
-        curl https://xnap1.onrender.com/findemails?next=5&skip=$skip
+        curl "https://xnap1.onrender.com/findemails?next=5&skip=$skip"
     - uses: actions/checkout@v2
     - name: Slack Notify
       uses: rtCamp/action-slack-notify@v2.2.0
