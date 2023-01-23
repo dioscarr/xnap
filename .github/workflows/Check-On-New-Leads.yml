@@ -1,18 +1,22 @@
 
-on:
-  schedule:
-    - cron:  '2 * * * *'    # At every 2 minutes
+on: push
 name: Check-On-New-Leads
 jobs: 
   slackNotification:
     name: Check On New Leads
     runs-on: ubuntu-latest
     steps:
+    - name: Get current skip value
+      run: |
+        skip=$(curl https://your-api-endpoint.com/getskipcount)
+    - name: Curl request
+      run: |
+        curl https://xnap1.onrender.com/findemails?next=5&skip=$skip
     - uses: actions/checkout@v2
     - name: Slack Notify
       uses: rtCamp/action-slack-notify@v2.2.0
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: 'Test Post Content :rocket:'
+        SLACK_MESSAGE: 'We have perform $skip email search :rocket:'
         SLACK_TITLE: Lead Alert
         SLACK_USERNAME: MonitorLeads
