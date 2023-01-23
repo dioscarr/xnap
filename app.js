@@ -47,7 +47,7 @@ app.get("/findemails", async (req, res) => {
   await client.connect();
   
   try { 
-    const skip = parseInt(req.query?.skip??"5");
+    const skip = parseInt(req.query?.skip??"5")+5;
     const next = parseInt(req.query?.next??"5");
     const collections = await client.db("xbusiness").listCollections().toArray();
     const emailsSkipCountExist = collections.some(
