@@ -11,12 +11,13 @@ jobs:
         echo "skip value: $skip"
     - name: Curl request
       run: |
+        echo "skip value: $skip"
         curl "https://xnap1.onrender.com/findemails?next=5&skip=$skip"
     - uses: actions/checkout@v2
     - name: Slack Notify
       uses: rtCamp/action-slack-notify@v2.2.0
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: "We have perform $skip email searches :rocket:"
-        SLACK_TITLE: Lead Alert
+        SLACK_MESSAGE: "We have perform {$skip} ${skip} email searches :rocket:"
+        SLACK_TITLE: Email Search Alert
         SLACK_USERNAME: MonitorLeads
