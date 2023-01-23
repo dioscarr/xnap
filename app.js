@@ -12,6 +12,36 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
+
+app.post("/addtoqueue", async (req, res) => {
+  await client.connect();
+  try {
+    const queue = req.body;
+    await client
+      .db("xbusiness")
+      .collection("queue")
+      .insertMany(queue)
+      .then((result) => {
+        //client.close();
+        res.status(201).json({
+          message: `Successfully inserted lead: ${result.insertedId}`,
+        });
+      })
+      .catch((err) => {
+        res.status(500).json({
+          message: err,
+        });
+      });
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+});
 app.get("/getskipcount", async (req,res)=>{
   await client.connect();
   try{
