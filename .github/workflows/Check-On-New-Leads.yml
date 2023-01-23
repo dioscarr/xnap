@@ -18,8 +18,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: Slack Notify
       uses: rtCamp/action-slack-notify@v2.2.0
-      env:
+      env:        
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: ${{ env.skip }} ":rocket:"
+        SLACK_MESSAGE: $(cat skip.txt) ":rocket:"
         SLACK_TITLE: Email Search Alert
         SLACK_USERNAME: MonitorLeads
