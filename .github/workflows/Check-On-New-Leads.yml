@@ -9,15 +9,16 @@ jobs:
       run: |
         skip=$(curl https://xnap1.onrender.com/getskipcount)
         echo "skip value: $skip"
+        echo "::set-env name=skip::$skip"
     - name: Curl request
       run: |
         echo "skip value: $skip"
-        curl "https://xnap1.onrender.com/findemails?next=5&skip=$skip"
+        curl "https://xnap1.onrender.com/findemails?next=5&skip=${{ env.skip }}"
     - uses: actions/checkout@v2
     - name: Slack Notify
       uses: rtCamp/action-slack-notify@v2.2.0
       env:
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: $skip ":rocket:"
+        SLACK_MESSAGE: ${{ env.skip }} ":rocket:"
         SLACK_TITLE: Email Search Alert
         SLACK_USERNAME: MonitorLeads
