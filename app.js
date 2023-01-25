@@ -476,7 +476,7 @@ app.post("/addtoreportqueue", async (req, res) => {
     const reportExisit = collections.some(
       (collection) => collection.name === "reports"
     );
-    if (!yelpcatsExist) {
+    if (!reportExisit) {
       await client.db("xbusiness").createCollection("reports");
       
     }
