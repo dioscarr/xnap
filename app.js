@@ -215,7 +215,6 @@ app.get("/findemails", async (req, res) => {
   }
 }
 )
-
 app.get("/ReloadCats", async (req, res) => {
   await client.connect();
   try {
@@ -466,10 +465,52 @@ app.delete("/leads/:id", async (req, res) => {
     }
   }
 });
+
+app.post("/addtoreportqueue", async (req, res) => {
+  await client.connect();
+  try {
+    const queue = req.body.data;
+
+    const collections = await client.db("xbusiness").listCollections().toArray();
+
+    const reportExisit = collections.some(
+      (collection) => collection.name === "reports"
+    );
+    if (!yelpcatsExist) {
+      await client.db("xbusiness").createCollection("reports");
+      
+    }
+    await client.db("xbusiness").collection("reports").insertMany(queue.map(x=>{return {xurl:x.xurl,skip:x.skip,limit:x.limit,created:x.created}}));
+
+    res.status(201).json({
+      message: `Successfully inserted addtoqueue`,
+    });
+
+    const yelpcatsExist = collections.some(
+      (collection) => collection.name === "notifyreportsqueue"
+    );
+    if (!yelpcatsExist) {
+      await client.db("xbusiness").createCollection("notifyreportsqueue");
+      
+    }
+    await client.db("xbusiness").collection("notifyreportsqueue").insertMany(queue.map(x=>{return {xurl:x.xurl}}));
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+});
+
 app.listen(3001, () => {
   console.log("http://localhost:3001/");
   console.log("http://localhost:3001/yelpcats");
   console.log("http://localhost:3001/leads");
   console.log("http://localhost:3001/ReloadCats");
   console.log("http://localhost:3001/findemails?next=2&skip=0");
+  console.log("http://localhost:3001/addtoreportqueue?next=2&skip=0");
 });
