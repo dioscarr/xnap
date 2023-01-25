@@ -482,9 +482,7 @@ app.post("/addtoreportqueue", async (req, res) => {
     }
     await client.db("xbusiness").collection("reports").insertMany(queue.map(x=>{return {xurl:x.xurl,skip:x.skip,limit:x.limit,created:x.created}}));
 
-    res.status(201).json({
-      message: `Successfully inserted addtoqueue`,
-    });
+   
 
     const yelpcatsExist = collections.some(
       (collection) => collection.name === "notifyreportsqueue"
@@ -495,6 +493,9 @@ app.post("/addtoreportqueue", async (req, res) => {
     }
     await client.db("xbusiness").collection("notifyreportsqueue").insertMany(queue.map(x=>{return {xurl:x.xurl}}));
 
+    res.status(201).json({
+      message: `Successfully inserted addtoreportqueue`,
+    });
   } catch (err) {
     res.status(500).json({
       message: err.message,
