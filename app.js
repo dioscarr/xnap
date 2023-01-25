@@ -469,7 +469,7 @@ app.delete("/leads/:id", async (req, res) => {
 app.post("/addtoreportqueue", async (req, res) => {
   await client.connect();
   try {
-    const queue = req.body.data;
+    const x = req.body.data;
 
     const collections = await client.db("xbusiness").listCollections().toArray();
 
@@ -480,7 +480,7 @@ app.post("/addtoreportqueue", async (req, res) => {
       await client.db("xbusiness").createCollection("reports");
       
     }
-    await client.db("xbusiness").collection("reports").insertMany(queue.map(x=>{return {xurl:x.xurl,skip:x.skip,limit:x.limit,created:x.created}}));
+    await client.db("xbusiness").collection("reports").insertOne({xurl:x.xurl,skip:x.skip,limit:x.limit,created:x.created});
 
    
 
@@ -491,7 +491,7 @@ app.post("/addtoreportqueue", async (req, res) => {
       await client.db("xbusiness").createCollection("notifyreportsqueue");
       
     }
-    await client.db("xbusiness").collection("notifyreportsqueue").insertMany(queue.map(x=>{return {xurl:x.xurl}}));
+    await client.db("xbusiness").collection("notifyreportsqueue").insertOne({xurl:x.xurl});
 
     res.status(201).json({
       message: `Successfully inserted addtoreportqueue`,
