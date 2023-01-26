@@ -606,6 +606,37 @@ app.post("/addtoreportqueue", async (req, res) => {
     }
   }
 });
+app.get("/dequereport", async (req, res) => {
+  await client.connect();
+  try {
+  
+    await client.db("xbusiness").collection("notifyreportsqueue").find()
+    .limit(1)
+    .toArray()
+    .then(async(queue) =>{
+      console.log(queue[0]);
+      if(queue.length>0)
+      {
+        console.log(encodeURI(queue[0].xurl));
+        await client.db("xbusiness").collection("notifyreportsqueue").deleteOne(queue[0]);
+        res.status(200).send(encodeURI(queue[0].xurl));
+      }
+      else
+      {
+        res.status(200).send("None");
+      }
+    })
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+});
+
 
 app.listen(3001, () => {
   console.log("http://localhost:3001/");
