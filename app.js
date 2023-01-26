@@ -105,6 +105,106 @@ app.get("/getskipcount", async (req,res)=>{
     }
   }
 })
+app.get("/setreportskipcount", async (req, res) => {
+  await client.connect();
+  
+  try { 
+    const skip = parseInt(req.query?.skip??"0")+2000;
+    const collections = await client.db("xbusiness").listCollections().toArray();
+    const emailsSkipCountExist = collections.some(
+      (collection) => collection.name === "reportskipcount"
+    );
+
+    if(emailsSkipCountExist)
+    {
+      await client
+      .db("xbusiness")
+      .collection("reportskipcount")
+      .find()
+      .sort({SkipCount:-1})
+      .limit(1)
+      .toArray()
+      .then(async(emailSkips) =>{
+        console.log(emailSkips);
+        if(emailSkips.length>0)
+        {
+          var sk = skip;
+              await client
+              .db("xbusiness")
+              .collection("reportskipcount")
+              .insertOne({SkipCount:sk})
+              .then((result) => {
+                console.log(`Skip Count Updated: ${result}`)   
+              });
+        }
+        else
+        {
+          await client
+          .db("xbusiness")
+          .collection("reportskipcount")
+          .insertOne({SkipCount:skip})
+          .then((result) => {
+            console.log(`Skip Count Updated: ${result}`)   
+          });
+        }
+      }) 
+    }
+    else
+    {
+      await client
+      .db("xbusiness")
+      .collection("reportskipcount")
+      .insertOne({SkipCount:skip})
+      .then((result) => {
+        console.log(`Skip Count Updated: ${result}`)   
+      });
+    }
+    res.status(200).send(
+     skip
+    );
+    
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+}
+)
+app.get("/getReportskipcount", async (req,res)=>{
+  await client.connect();
+  try{
+    await client
+    .db("xbusiness")
+    .collection("reportskipcount")
+    .find()
+    .sort({SkipCount:-1})
+    .limit(1)
+    .toArray()
+    .then(async(emailSkips) =>{
+      console.log(emailSkips);
+      if(emailSkips.length>0)
+      {
+        res.status(200).send(emailSkips[0].SkipCount.toString());
+      }
+      else
+      {
+        res.status(200).send("0");
+      }
+    })
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+})
 app.get("/findemails", async (req, res) => {
   await client.connect();
   
@@ -514,4 +614,6 @@ app.listen(3001, () => {
   console.log("http://localhost:3001/ReloadCats");
   console.log("http://localhost:3001/findemails?next=2&skip=0");
   console.log("http://localhost:3001/addtoreportqueue?next=2&skip=0");
+  console.log("http://localhost:3001/getReportskipcount?skip=0");
+  console.log("http://localhost:3001/setreportskipcount?skip=0");
 });
