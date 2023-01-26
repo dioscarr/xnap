@@ -160,7 +160,7 @@ app.get("/setreportskipcount", async (req, res) => {
       });
     }
     res.status(200).send(
-     skip
+     skip.toString()
     );
     
   } catch (err) {
@@ -185,7 +185,7 @@ app.get("/getReportskipcount", async (req,res)=>{
     .limit(1)
     .toArray()
     .then(async(emailSkips) =>{
-      console.log(emailSkips);
+      console.log(emailSkips);  
       if(emailSkips.length>0)
       {
         res.status(200).send(emailSkips[0].SkipCount.toString());
