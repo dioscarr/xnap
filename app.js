@@ -6,6 +6,11 @@ const client = require("./db");
 const { ObjectId } = require("mongodb");
 const bodyParser = require("body-parser");
 
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+
+
+
+
 app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -391,7 +396,7 @@ app.get("/BusinessSearch", async (req, res) => {
       .then(async (response) => {
        // const randomIndex = Math.floor(Math.random() * response.data.length);
        // const data = response.data[randomIndex];
-        const leads = response.data.map(data=>{return {
+        const leads = response.data.slice(0,1).map(data=>{return {
           xname: data.name,
           xphone: data.phone,
           xurl: `${data.url}`,
@@ -582,8 +587,6 @@ app.post("/addtoreportqueue", async (req, res) => {
     }
     await client.db("xbusiness").collection("reports").insertOne({xurl:x.xurl,skip:x.skip,limit:x.limit,created:x.created});
 
-   
-
     const yelpcatsExist = collections.some(
       (collection) => collection.name === "notifyreportsqueue"
     );
@@ -636,7 +639,145 @@ app.get("/dequereport", async (req, res) => {
     }
   }
 });
+app.get("/ziptolatlon", async (req, res) => {
+  await client.connect();
+  try {
+    const zip = parseInt(req.query.zip??"10040");
+    const collections = await client.db("xbusiness").listCollections().toArray();
 
+    const reportExisit = collections.some(
+      (collection) => collection.name === "ziptolatlon"
+    );
+    if (!reportExisit) {
+      await client.db("xbusiness").createCollection("ziptolatlon");
+      await client.db("xbusiness").collection("ziptolatlon").createIndex({"zip":1},{unique:true}); // unique
+    }     
+      await axios.get(`https://recipexerver.onrender.com/ziptolatlon?zip=${zip.toString()}`).then(async result=>{
+       await client.db("xbusiness").collection("ziptolatlon").insertOne(result.data).then( result=>{
+        res.status(200).json(result);
+      })
+    })
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      client.close();
+    }
+  }
+});
+app.get("/leadsziptolatlon", async (req, res) => {
+  await client.connect();
+  try {
+    const zip = parseInt(req.query.zip??"10040");
+    const collections = await client.db("xbusiness").listCollections().toArray();
+
+    const reportExisit = collections.some(
+      (collection) => collection.name === "ziptolatlon"
+    );
+    if (!reportExisit) {
+      await client.db("xbusiness").createCollection("ziptolatlon");
+      await client.db("xbusiness").collection("ziptolatlon").createIndex({"zip":1},{unique:true}); // unique
+    }
+
+const a = [];
+  await client
+  .db("xbusiness")
+  .collection("lead")  
+  .distinct('zip')
+  .then(async(zips) => {
+   const resp =  zips.filter(x=>x.length == 5).map(async zip=>{
+       console.log(`https://recipexerver.onrender.com/ziptolatlon?zip=${zip}`);
+       return await axios.get(`https://recipexerver.onrender.com/ziptolatlon?zip=${zip}`).then(async result=>{
+          console.log(result)
+         return await client.db("xbusiness").collection("ziptolatlon").insertOne(result.data)
+             .then(ziptolatlon=>{
+              console.log("done!")
+              a.push(ziptolatlon);
+             }).catch(error=>console.log(error));
+      })
+    })
+    await Promise.all(resp).then(result=>{
+
+      res.status(200).json(a);
+
+    });
+  });
+
+  
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+});
+app.get("/geoleads", async (req, res) => {
+  const csvWriter = createCsvWriter({
+    path: 'geoleads.csv',
+    header: [
+        {id: 'xname', title: 'xname'},
+        {id: 'Latitude', title: 'Latitude'},
+        {id: 'Longitude', title: 'Longitude'},
+    ]
+});
+  await client.connect();
+  try {
+    await client
+    .db("xbusiness")
+    .collection("lead")
+    .aggregate([
+      {
+        $lookup: {
+        from: "ziptolatlon",
+        localField: "zip",
+        foreignField: "zip",
+        as: "geoleads"
+        }
+      },
+      {
+        $match: { "geoleads.Latitude": { $ne: "N/A" } }
+      },
+      {
+        $unwind: "$geoleads"
+      },
+      {
+        $project: {
+            _id: 0,
+            xname: 1,
+            Latitude: { $toDecimal: "$geoleads.Latitude" },
+            Longitude: { $toDecimal: "$geoleads.Longitude" }
+        }
+    }
+  ])
+   
+    .toArray()
+    .then((geoleads) =>{
+
+      csvWriter
+      .writeRecords(geoleads)
+      .then(() => {
+        console.log('...File written');
+        res.setHeader('Content-Type', 'text/csv');
+        res.setHeader('Content-Disposition', 'attachment; filename=geoleads.csv');
+        res.download('./geoleads.csv', 'geoleads.csv');
+      });
+    })
+    .catch((err) => res.status(500).json({message: err,}));
+  } catch (err) {
+    res.status(500).json({
+      message: err,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+});
 
 app.listen(3001, () => {
   console.log("http://localhost:3001/");
@@ -647,4 +788,7 @@ app.listen(3001, () => {
   console.log("http://localhost:3001/addtoreportqueue?next=2&skip=0");
   console.log("http://localhost:3001/getReportskipcount?skip=0");
   console.log("http://localhost:3001/setreportskipcount?skip=0");
+  console.log("http://localhost:3001/ziptolatlon?zip=13039");
+  console.log("http://localhost:3001/leadsziptolatlon");
+  console.log("http://localhost:3001/geoleads");
 });

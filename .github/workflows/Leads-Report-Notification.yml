@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron:  '*/60 * * * *'
+    - cron:  '*/5 * * * *'
      
 name: Leads-Report-Notification
 jobs: 
