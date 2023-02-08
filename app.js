@@ -214,8 +214,8 @@ app.get("/findemails", async (req, res) => {
   await client.connect();
   
   try { 
-    const skip = parseInt(req.query?.skip??"5")+5;
-    const next = parseInt(req.query?.next??"5");
+    const skip = parseInt(req.query?.skip??"1")+1;
+    const next = parseInt(req.query?.next??"1");
     const collections = await client.db("xbusiness").listCollections().toArray();
     const emailsSkipCountExist = collections.some(
       (collection) => collection.name === "emailsSkipCount"
@@ -429,7 +429,7 @@ app.get("/BusinessSearch", async (req, res) => {
     console.error(error);
   } finally {
     if (client != undefined && client !== "undefined") {
-      client.close();
+      //client.close();
     }
   }
 });
