@@ -8,9 +8,6 @@ const bodyParser = require("body-parser");
 
 const createCsvWriter = require('csv-writer').createObjectCsvWriter;
 
-
-
-
 app.use(cors());
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -387,26 +384,35 @@ app.get("/BusinessSearch", async (req, res) => {
     console.log(`https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`);
     if(location==="" && Category ==="")
       throw new Error("location and category parameters are required! Those should be lower case");
-    
-    await axios
+      await axios
       .get(
-       `https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
-       // `http://localhost:3002/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
-      )
-      .then(async (response) => {
-       // const randomIndex = Math.floor(Math.random() * response.data.length);
-       // const data = response.data[randomIndex];
-        const leads = response.data.slice(0,1).map(data=>{return {
-          xname: data.name,
-          xphone: data.phone,
-          xurl: `${data.url}`,
-          citystate: data.citystate,
-          categories: data.categories,
-          review_count: data.review_count,
-          review_count: data.review_count,
-          zip: data.zip,
-          rating: data.rating,
-        }});
+       //`https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+       //`http://localhost:3002/FullBusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+       `https://recipexerver.onrender.com/FullBusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+      ).then(async (response1) => 
+      {     
+        await axios
+          .post(
+          //`https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`
+          //`http://localhost:3002/FindBusinessUrls?location=${location}`,
+          `https://recipexerver.onrender.com/FindBusinessUrls?location=${location}`,
+            {data:response1.data.businesses}
+          )
+          .then(async (response) => {
+          // const randomIndex = Math.floor(Math.random() * response.data.length);
+          // const data = response.data[randomIndex];
+            const leads = response.data.map(data=>{return {
+              xname: data.name,
+              xphone: data.phone,
+              xurl: `${data.url}`,
+              citystate: data.citystate,
+              categories: data.categories,
+              review_count: data.review_count,
+              review_count: data.review_count,
+              zip: data.zip,
+              rating: data.rating,
+            }});
+     
         console.log(leads);
         await client
           .db("xbusiness")
@@ -415,7 +421,7 @@ app.get("/BusinessSearch", async (req, res) => {
           .insertMany(leads)
           .then((result) => {
             res.status(201).json({
-              message: `Successfully inserted leads`,
+              message: `Successfully inserted leads ${result.insertedCount}`,
             });
           })
           .catch((err) => {
@@ -424,6 +430,7 @@ app.get("/BusinessSearch", async (req, res) => {
             });
           });
       });
+    });
   } catch (error) {
     
     console.error(error);
@@ -570,7 +577,6 @@ app.delete("/leads/:id", async (req, res) => {
     }
   }
 });
-
 app.post("/addtoreportqueue", async (req, res) => {
   await client.connect();
   try {
