@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron:  '*/60 * * * *'
+    - cron:  '*/6 * * * *'
 name: Check-On-New-Leads
 jobs: 
   slackNotification:
