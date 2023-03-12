@@ -36,7 +36,7 @@ app.get("/dequeue", async (req,res)=>{
         res.status(200).send("done");
       }
     })
-  } catch (err) {
+  } catch (err) {http://localhost:3001/BusinessSearch?location=Schenectady%20County%20NY&category=bankruptcy
     res.status(500).json({
       message: err.message,
     });
@@ -45,7 +45,7 @@ app.get("/dequeue", async (req,res)=>{
       //client.close();
     }
   }
-})
+});
 app.post("/addtoqueue", async (req, res) => {
   await client.connect();
   try {
@@ -106,7 +106,7 @@ app.get("/getskipcount", async (req,res)=>{
       //client.close();
     }
   }
-})
+});
 app.get("/setreportskipcount", async (req, res) => {
   await client.connect();
   
@@ -175,7 +175,30 @@ app.get("/setreportskipcount", async (req, res) => {
     }
   }
 }
-)
+);
+app.get("/GetLeadCount", async (req,res)=>{
+  await client.connect();
+  try{
+    await client
+    .db("xbusiness")
+    .collection("lead")
+   .countDocuments((err, count) => {
+    if (err) throw err;
+    res.json({ count });
+           
+    console.log(`The total number of documents in mycollection is: ${count}`);
+    client.close();
+  });
+     
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }}
+  });
 app.get("/getReportskipcount", async (req,res)=>{
   await client.connect();
   try{
@@ -206,7 +229,7 @@ app.get("/getReportskipcount", async (req,res)=>{
       //client.close();
     }
   }
-})
+});
 app.get("/findemails", async (req, res) => {
   await client.connect();
   
@@ -316,7 +339,7 @@ app.get("/findemails", async (req, res) => {
     }
   }
 }
-)
+);
 app.get("/ReloadCats", async (req, res) => {
   await client.connect();
   try {
