@@ -1,6 +1,6 @@
 on:
   schedule:
-    - cron:  '*/60 1 * * *'
+    - cron:  '*/6 * * * *'
 jobs: 
   slackNotification:
     name: Leads Report Notification
