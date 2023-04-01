@@ -820,4 +820,5 @@ app.listen(3001, () => {
   console.log("http://localhost:3001/ziptolatlon?zip=13039");
   console.log("http://localhost:3001/leadsziptolatlon");
   console.log("http://localhost:3001/geoleads");
+  console.log("http://localhost:3001/getleadcount");
 });

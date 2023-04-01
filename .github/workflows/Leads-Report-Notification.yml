@@ -1,24 +1,24 @@
-on:
-  schedule:
-    - cron:  '*/6 * * * *'
-jobs: 
-  slackNotification:
-    name: Leads Report Notification
-    runs-on: ubuntu-latest
-    steps:
-    - name: Get Lastest Report      
-      id: 'deploy-message' 
-      run: |
-        skip=$(curl https://xnap1.onrender.com/dequereport)
-        echo "skip value: $skip" 
-        echo "$skip" > skip.txt
-        echo "::set-output name=commit_msg::$skip"    
-    - uses: actions/checkout@v2
-    - name: Slack Leads Report Notification
-      uses: rtCamp/action-slack-notify@v2.2.0
-      env:        
-        SLACK_WEBHOOK: ${{ secrets.SLACK_LEAD_REPORT }}
-        SLACK_MESSAGE: ${{ steps.deploy-message.outputs.commit_msg }} "New Report Testing 123. This is a test :rocket:"
+# on:
+#   schedule:
+#     - cron:  '*/6 * * * *'
+# jobs: 
+#   slackNotification:
+#     name: Leads Report Notification
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Get Lastest Report      
+#       id: 'deploy-message' 
+#       run: |
+#         skip=$(curl https://xnap1.onrender.com/dequereport)
+#         echo "skip value: $skip" 
+#         echo "$skip" > skip.txt
+#         echo "::set-output name=commit_msg::$skip"    
+#     - uses: actions/checkout@v2
+#     - name: Slack Leads Report Notification
+#       uses: rtCamp/action-slack-notify@v2.2.0
+#       env:        
+#         SLACK_WEBHOOK: ${{ secrets.SLACK_LEAD_REPORT }}
+#         SLACK_MESSAGE: ${{ steps.deploy-message.outputs.commit_msg }} "New Report Testing 123. This is a test :rocket:"
         
-        SLACK_TITLE: Report
-        SLACK_USERNAME: ReportBot
+#         SLACK_TITLE: Report
+#         SLACK_USERNAME: ReportBot
