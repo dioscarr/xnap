@@ -54,10 +54,10 @@ app.get("/dequeue", async (req,res)=>{
     .limit(1)
     .toArray()
     .then(async(queue) =>{
-      console.log(queue[0]);
+      //console.log(queue[0]);
       if(queue.length>0)
       {
-        console.log(encodeURI(queue[0].xurl));
+        
         await client.db("xbusiness").collection("queue").deleteOne(queue[0]);
         res.status(200).send(encodeURI(queue[0].xurl));
       }
@@ -117,7 +117,7 @@ app.get("/getskipcount", async (req,res)=>{
     .limit(1)
     .toArray()
     .then(async(emailSkips) =>{
-      console.log(emailSkips);
+     
       if(emailSkips.length>0)
       {
         res.status(200).send(emailSkips[0].SkipCount.toString());
@@ -157,7 +157,7 @@ app.get("/setreportskipcount", async (req, res) => {
       .limit(1)
       .toArray()
       .then(async(emailSkips) =>{
-        console.log(emailSkips);
+      
         if(emailSkips.length>0)
         {
           var sk = skip;
@@ -166,7 +166,7 @@ app.get("/setreportskipcount", async (req, res) => {
               .collection("reportskipcount")
               .insertOne({SkipCount:sk})
               .then((result) => {
-                console.log(`Skip Count Updated: ${result}`)   
+               
               });
         }
         else
@@ -176,7 +176,7 @@ app.get("/setreportskipcount", async (req, res) => {
           .collection("reportskipcount")
           .insertOne({SkipCount:skip})
           .then((result) => {
-            console.log(`Skip Count Updated: ${result}`)   
+           
           });
         }
       }) 
@@ -188,7 +188,7 @@ app.get("/setreportskipcount", async (req, res) => {
       .collection("reportskipcount")
       .insertOne({SkipCount:skip})
       .then((result) => {
-        console.log(`Skip Count Updated: ${result}`)   
+        //console.log(`Skip Count Updated: ${result}`)   
       });
     }
     res.status(200).send(
@@ -208,18 +208,18 @@ app.get("/setreportskipcount", async (req, res) => {
 );
 app.get("/GetLeadCount", async (req,res)=>{
   try{
-    console.log("calling connect");
+    //console.log("calling connect");
     await client.connect();
-    console.log("connected");
+    //console.log("connected");
     const count = await client
     .db("xbusiness")
     .collection("lead")
     .countDocuments();
     res.json({ count });
-    console.log(`The total number of documents in mycollection is: ${count}`);
+    //console.log(`The total number of documents in mycollection is: ${count}`);
   } catch (err) {
-    console.log("There was an error.");
-    console.log(err);
+    //console.log("There was an error.");
+    //console.log(err);
     res.status(500).json({
       message: err.message,
       stack: err.stack,
@@ -240,7 +240,7 @@ app.get("/getReportskipcount", async (req,res)=>{
     .limit(1)
     .toArray()
     .then(async(emailSkips) =>{
-      console.log(emailSkips);  
+      //console.log(emailSkips);  
       if(emailSkips.length>0)
       {
         res.status(200).send(emailSkips[0].SkipCount.toString());
@@ -281,7 +281,7 @@ app.get("/findemails", async (req, res) => {
       .limit(1)
       .toArray()
       .then(async(emailSkips) =>{
-        console.log(emailSkips);
+        //console.log(emailSkips);
         if(emailSkips.length>0)
         {
           var sk = skip;
@@ -290,7 +290,7 @@ app.get("/findemails", async (req, res) => {
               .collection("emailsSkipCount")
               .insertOne({SkipCount:sk})
               .then((result) => {
-                console.log(`Skip Count Updated: ${result}`)   
+                //console.log(`Skip Count Updated: ${result}`)   
               });
         }
         else
@@ -300,7 +300,7 @@ app.get("/findemails", async (req, res) => {
           .collection("emailsSkipCount")
           .insertOne({SkipCount:skip})
           .then((result) => {
-            console.log(`Skip Count Updated: ${result}`)   
+            //console.log(`Skip Count Updated: ${result}`)   
           });
         }
       }) 
@@ -312,7 +312,7 @@ app.get("/findemails", async (req, res) => {
       .collection("emailsSkipCount")
       .insertOne({SkipCount:skip})
       .then((result) => {
-        console.log(`Skip Count Updated: ${result}`)   
+        //console.log(`Skip Count Updated: ${result}`)   
       });
     }  
 
@@ -330,14 +330,14 @@ app.get("/findemails", async (req, res) => {
         leads.filter(x=>x.xurl!=="N/A").map(async lead=>
         {
         const params = {url:lead.xurl}
-        console.log("{url:x.xurl}" + lead.xurl)
+        //console.log("{url:x.xurl}" + lead.xurl)
          const response = axios.get("https://pyyelp.onrender.com/findemail", { params })
          //const response = axios.get("http://127.0.0.1:5000/findemail", { params })
         return response;
         })
       ).then(async response=>
         {
-          console.log(response)
+          //console.log(response)
           if(response.length>0)
           {
             await client
@@ -376,7 +376,7 @@ app.get("/ReloadCats", async (req, res) => {
     const response = await axios.get(
       "https://recipexerver.onrender.com/yelp/categoriesandaliases"
     );
-    console.log(response.data);
+    //console.log(response.data);
     const data = response.data;
     const db = client.db("xbusiness");
     const collections = await db.listCollections().toArray();
@@ -384,10 +384,10 @@ app.get("/ReloadCats", async (req, res) => {
       (collection) => collection.name === "cats"
     );
     if (yelpcatsExist) {
-      console.log("Collection 'yelpcats' exists");
+      //console.log("Collection 'yelpcats' exists");
       await db.collection("cats").drop();
     } else {
-      console.log("Collection 'yelpcats' does not exist");
+      //console.log("Collection 'yelpcats' does not exist");
     }
     await db.createCollection("cats");
     await db.collection("cats").insertMany(data);
@@ -434,7 +434,7 @@ app.get("/BusinessSearch", async (req, res) => {
   try {
     const location = req.query?.location??"";
     const Category = req.query?.category??"";
-    console.log(`https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`);
+    //console.log(`https://recipexerver.onrender.com/BusinessSearchByLocationCategories?location=${location}&category=${Category}&limit=1`);
     if(location==="" && Category ==="")
       throw new Error("location and category parameters are required! Those should be lower case");
       await axios
@@ -466,7 +466,7 @@ app.get("/BusinessSearch", async (req, res) => {
               rating: data.rating,
             }});
      
-        console.log(leads);
+        //console.log(leads);
         await client
           .db("xbusiness")
           .collection("lead")
@@ -486,7 +486,7 @@ app.get("/BusinessSearch", async (req, res) => {
     });
   } catch (error) {
     
-    console.error(error);
+    //console.error(error);
   } finally {
     if (client != undefined && client !== "undefined") {
       //client.close();
@@ -676,10 +676,10 @@ app.get("/dequereport", async (req, res) => {
     .limit(1)
     .toArray()
     .then(async(queue) =>{
-      console.log(queue[0]);
+      //console.log(queue[0]);
       if(queue.length>0)
       {
-        console.log(encodeURI(queue[0].xurl));
+        //console.log(encodeURI(queue[0].xurl));
         await client.db("xbusiness").collection("notifyreportsqueue").deleteOne(queue[0]);
         res.status(200).send(encodeURI(queue[0].xurl));
       }
@@ -747,14 +747,14 @@ const a = [];
   .distinct('zip')
   .then(async(zips) => {
    const resp =  zips.filter(x=>x.length == 5).map(async zip=>{
-       console.log(`https://recipexerver.onrender.com/ziptolatlon?zip=${zip}`);
+       //console.log(`https://recipexerver.onrender.com/ziptolatlon?zip=${zip}`);
        return await axios.get(`https://recipexerver.onrender.com/ziptolatlon?zip=${zip}`).then(async result=>{
-          console.log(result)
+          //console.log(result)
          return await client.db("xbusiness").collection("ziptolatlon").insertOne(result.data)
              .then(ziptolatlon=>{
-              console.log("done!")
+              //console.log("done!")
               a.push(ziptolatlon);
-             }).catch(error=>console.log(error));
+             }).catch(error=>//console.log(error));
       })
     })
     await Promise.all(resp).then(result=>{
@@ -820,7 +820,7 @@ app.get("/geoleads", async (req, res) => {
       csvWriter
       .writeRecords(geoleads)
       .then(() => {
-        console.log('...File written');
+        //console.log('...File written');
         res.setHeader('Content-Type', 'text/csv');
         res.setHeader('Content-Disposition', 'attachment; filename=geoleads.csv');
         res.download('./geoleads.csv', 'geoleads.csv');
@@ -839,16 +839,16 @@ app.get("/geoleads", async (req, res) => {
 });
 
 app.listen(3001, () => {
-  console.log("http://localhost:3001/");
-  console.log("http://localhost:3001/yelpcats");
-  console.log("http://localhost:3001/leads");
-  console.log("http://localhost:3001/ReloadCats");
-  console.log("http://localhost:3001/findemails?next=2&skip=0");
-  console.log("http://localhost:3001/addtoreportqueue?next=2&skip=0");
-  console.log("http://localhost:3001/getReportskipcount?skip=0");
-  console.log("http://localhost:3001/setreportskipcount?skip=0");
-  console.log("http://localhost:3001/ziptolatlon?zip=13039");
-  console.log("http://localhost:3001/leadsziptolatlon");
-  console.log("http://localhost:3001/geoleads");
-  console.log("http://localhost:3001/getleadcount");
+  //console.log("http://localhost:3001/");
+  //console.log("http://localhost:3001/yelpcats");
+  //console.log("http://localhost:3001/leads");
+  //console.log("http://localhost:3001/ReloadCats");
+  //console.log("http://localhost:3001/findemails?next=2&skip=0");
+  //console.log("http://localhost:3001/addtoreportqueue?next=2&skip=0");
+  //console.log("http://localhost:3001/getReportskipcount?skip=0");
+  //console.log("http://localhost:3001/setreportskipcount?skip=0");
+  //console.log("http://localhost:3001/ziptolatlon?zip=13039");
+  //console.log("http://localhost:3001/leadsziptolatlon");
+  //console.log("http://localhost:3001/geoleads");
+  //console.log("http://localhost:3001/getleadcount");
 });
