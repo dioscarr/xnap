@@ -14,6 +14,36 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(bodyParser.json());
 
+app.post("/AddDailyYouTubeTops", async (req, res) => {
+  await client.connect();
+  try {
+    const DailyYouTubeTops = req.body.data;
+
+
+    const collections = await client.db("xmarketing").listCollections().toArray();
+    const DailyYouTubeTopsExist = collections.some(
+      (collection) => collection.name === "DailyYouTubeTops"
+    );
+    if (!DailyYouTubeTopsExist) {
+      await client.db("xmarketing").createCollection("DailyYouTubeTops");
+      
+    }
+    await client.db("xmarketing").collection("DailyYouTubeTops").insertMany(DailyYouTubeTops);
+
+    res.status(201).json({
+      message: `Successfully inserted DailyYouTubeTops`,
+    });
+
+  } catch (err) {
+    res.status(500).json({
+      message: err.message,
+    });
+  } finally {
+    if (client != undefined && client !== "undefined") {
+      //client.close();
+    }
+  }
+});
 app.get("/dequeue", async (req,res)=>{
   await client.connect();
   try{
@@ -177,22 +207,22 @@ app.get("/setreportskipcount", async (req, res) => {
 }
 );
 app.get("/GetLeadCount", async (req,res)=>{
-  await client.connect();
   try{
-    await client
+    console.log("calling connect");
+    await client.connect();
+    console.log("connected");
+    const count = await client
     .db("xbusiness")
     .collection("lead")
-   .countDocuments((err, count) => {
-    if (err) throw err;
+    .countDocuments();
     res.json({ count });
-           
     console.log(`The total number of documents in mycollection is: ${count}`);
-    client.close();
-  });
-     
   } catch (err) {
+    console.log("There was an error.");
+    console.log(err);
     res.status(500).json({
       message: err.message,
+      stack: err.stack,
     });
   } finally {
     if (client != undefined && client !== "undefined") {
