@@ -1,31 +1,31 @@
-# on:
-  schedule:
-    - cron:  '*/6 * * * *'
+# # on:
+#   schedule:
+#     - cron:  '*/6 * * * *'
      
-name: Find-New-Leads
-jobs: 
-  slackNotification:
-    name: Find New Leads
-    runs-on: ubuntu-latest
-    steps:
-    - name: Curl DeQueue
-      id: 'deploy-message' 
-      run: |
-        skip=$(curl https://xnap1.onrender.com/dequeue)
-        echo "skip value: $skip" 
-        echo "$skip" > skip.txt
-        echo "::set-output name=commit_msg::$skip" 
-    - name: Curl New Business Search
-      run: |
-        skip=$(cat skip.txt)
-        echo "skip value: $skip"
-        curl "$skip"
-    - uses: actions/checkout@v2
-    - name: Find Potential Business Slack Notify
-      uses: rtCamp/action-slack-notify@v2.2.0
-      env:        
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-        SLACK_MESSAGE: ${{ steps.deploy-message.outputs.commit_msg }} "We golden another batch completed :rocket:"
+# name: Find-New-Leads
+# jobs: 
+#   slackNotification:
+#     name: Find New Leads
+#     runs-on: ubuntu-latest
+#     steps:
+#     - name: Curl DeQueue
+#       id: 'deploy-message' 
+#       run: |
+#         skip=$(curl https://xnap1.onrender.com/dequeue)
+#         echo "skip value: $skip" 
+#         echo "$skip" > skip.txt
+#         echo "::set-output name=commit_msg::$skip" 
+#     - name: Curl New Business Search
+#       run: |
+#         skip=$(cat skip.txt)
+#         echo "skip value: $skip"
+#         curl "$skip"
+#     - uses: actions/checkout@v2
+#     - name: Find Potential Business Slack Notify
+#       uses: rtCamp/action-slack-notify@v2.2.0
+#       env:        
+#         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+#         SLACK_MESSAGE: ${{ steps.deploy-message.outputs.commit_msg }} "We golden another batch completed :rocket:"
         
-        SLACK_TITLE: Find New Lead Alert
-        SLACK_USERNAME: LeadSearch
+#         SLACK_TITLE: Find New Lead Alert
+#         SLACK_USERNAME: LeadSearch
